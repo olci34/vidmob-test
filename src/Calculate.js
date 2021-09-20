@@ -21,8 +21,15 @@ function Calculate() {
 
 function splitByPlusAndCalculate(str) {
     const strArr = str.split("+")
-    const intArr = strArr.map(str => parseInt(str))
+    const intArr = strArr.map(str => splitByMinusAndCalculate(str))  
     const result = intArr.reduce((acc, no) => acc + no)
+    return result
+}
+
+function splitByMinusAndCalculate(str) {
+    const strArr = str.split("-")
+    const intArr = strArr.map(str => parseInt(str))
+    const result = intArr.reduce((acc, no) => acc - no)
     return result
 }
 
