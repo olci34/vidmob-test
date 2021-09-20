@@ -6,13 +6,8 @@ function Calculate() {
     const [result, setResult] = useState("")
     const handleChange = (e) => { setInput(e.target.value) }
     const handleCalculateButton = () => {
-        const inputArr = input.match(/[\d*/+-/()]/g)
-        if (!inputArr || inputArr.length !== input.length) {
-            alert('Wrong Input. Please only use digits and +-*/() characters without any space')
-        } else {
-            let result = splitByPlusAndCalculate(input) 
-            setResult(result)
-        }
+        let result = calculate(input) 
+        setResult(result)
     }
 
     return (
@@ -24,10 +19,23 @@ function Calculate() {
     )
 }
 
-function splitByPlusAndCalculate(str) {
-    if (!operatorsValid(str)) {
-        return alert("You can't use more than 2 operators in series.\nThe second operator of a series can only be '-'.\nYou can't leave paranthesis open.\nYou can't start with operators expect it is a negative number.")
+function calculate(str) {
+    /* 
+    First we are checking for validation of str.
+    #operatorsValid() ignores inside of parantheses during validation.
+    Because #calculate() acts as recursive method for parantheses, so
+    eventually inside of parantheses will be validated.
+    */
+    if (!inputValid(str)){
+        return alert('Invalid Input. Please only use digits and +-*/() characters without any space')
     }
+    if (!syntaxValid(str)) {
+        return alert("Syntax Error.\nYou can't use more than 2 operators in series.\nThe second operator of a series can only be '-'.\nYou can't leave paranthesis open.\nYou can't start with operators expect it is a negative number.")
+    }
+    return splitByPlusAndCalculate(str)
+}
+
+function splitByPlusAndCalculate(str) {
     const strArr = customSplit(str, "+")
     const intArr = strArr.map(str => splitByMinusAndCalculate(str))  
     const result = intArr.reduce((acc, no) => acc + no)
@@ -68,7 +76,7 @@ function splitByDivideAndCalculate(str) {
     const intArr = strArr.map(str => {
         if (str[0] === "(") {
             // If we hit the paranthesis, we calculate it localy by using recursion.
-            return splitByPlusAndCalculate(str.substring(1, str.length-1))
+            return calculate(str.substring(1, str.length-1))
         } else {
             return Number(Number(str).toFixed(2))
         }
@@ -100,10 +108,12 @@ function customSplit(str, operator) {
 
     return res;
 }
-// Validates operators and parantheses
-function operatorsValid(str) { 
 
-    if ("+*/)".includes(str[0])) return false
+// Validates operators and parantheses
+function syntaxValid(str) { 
+
+    if ("+*/)".includes(str[0])) return false // str can't start with "+/*)"
+    if ("+-*/.".includes(str[str.length-1])) return false // str can't end with an operator
     let stack = []
     let operators = ["+","-","*","/"]
     let parantheses = 0
@@ -125,6 +135,11 @@ function operatorsValid(str) {
         }
     }
     return parantheses === 0
+}
+
+function inputValid(input) {
+    const inputArr = input.match(/[\d*/+-/().]/g)
+    return (inputArr && inputArr.length === input.length)
 }
 
 export default Calculate
