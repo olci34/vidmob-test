@@ -11,21 +11,18 @@ function Calculate() {
     }
 
     return (
-        <div>
-            <input type="text" value={input} onChange={handleChange}></input>
-            <button onClick={handleCalculateButton}>Calculate</button>
-            <h3> Result: {result} </h3>
+        <div id='calculate-box'>
+            <input id="input" type="text" value={input} onChange={handleChange}></input>
+            <button id="calculate-button" onClick={handleCalculateButton}>Calculate</button>
+            <h3 id="result"> Result: {result} </h3>
         </div>
     )
 }
 
 function calculate(str) {
-    /* 
-    First we are checking for validation of str.
-    #operatorsValid() ignores inside of parantheses during validation.
-    Because #calculate() acts as recursive method for parantheses, so
-    eventually inside of parantheses will be validated.
-    */
+    // Get rid of spaces.
+    str = str.replace(/\s/g, '')
+    // Check for validations
     if (!inputValid(str)){
         return alert('Invalid Input. Please only use digits and +-*/() characters without any space')
     }
@@ -111,7 +108,12 @@ function customSplit(str, operator) {
 
 // Validates operators and parantheses
 function syntaxValid(str) { 
-
+    /* 
+    Validates for operators and parantheses of str.
+    #syntaxValid() ignores inside of parantheses during validation.
+    Because it is called in #calculate() and 
+    #calculate() is called recursively to handle inside of parantheses.
+    */
     if ("+*/)".includes(str[0])) return false // str can't start with "+/*)"
     if ("+-*/.".includes(str[str.length-1])) return false // str can't end with an operator
     let stack = []
@@ -138,7 +140,7 @@ function syntaxValid(str) {
 }
 
 function inputValid(input) {
-    const inputArr = input.match(/[\d*/+-/().]/g)
+    const inputArr = input.match(/[\d*/+-/().\s]/g)
     return (inputArr && inputArr.length === input.length)
 }
 

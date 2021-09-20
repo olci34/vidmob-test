@@ -1,0 +1,32 @@
+html,body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-image: radial-gradient(#b5e48c, #1a759f);
+  overflow: hidden;
+}
+#calculate-box {
+  position: absolute;
+  height: 10%;
+  width: 40%;
+  top: 40%;
+  left: 30%;
+  text-align: center;
+  font-size: larger;
+}
+
+#input {
+  position: relative;
+  width: 80%;
+  font-size: inherit;
+}
+
+#calculate-button {
+  font-size: inherit;
+}
+
+#result {
+  color: #184e77;
+}
