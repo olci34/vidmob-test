@@ -25,11 +25,33 @@ function splitByPlusAndCalculate(str) {
     const result = intArr.reduce((acc, no) => acc + no)
     return result
 }
-
-function splitByMinusAndCalculate(str) {
-    const strArr = str.split("-")
+// 6-15--5*-4-35
+//   s  s    js
+// ij
+//33
+//ij
+function splitByMinusAndCalculate(str) { // -5--2
+    if (Number(str)) return parseInt(str)
+    const strArr = []
+    let s = 0
+    for (let j=0; j < str.length; j++) {
+        if (j === str.length-1) strArr.push(str.substring(s,j+1))
+        if (str[j] === "-" && Number(str[j-1])) {
+            if (j > s) {
+                strArr.push(str.substring(s,j))
+                s = j+1
+            }
+        }
+    }
     const intArr = strArr.map(str => parseInt(str))
     const result = intArr.reduce((acc, no) => acc - no)
+    return parseInt(result)
+}
+
+function splitByTimeAndCalculate(str) {
+    const strArr = str.split("*")
+    const intArr = strArr.map(str => parseInt(str))
+    const result = intArr.reduce((acc, no) => acc * no)
     return result
 }
 
