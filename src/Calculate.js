@@ -20,7 +20,7 @@ function Calculate() {
 }
 
 function splitByPlusAndCalculate(str) {
-    const strArr = str.split("+")
+    const strArr = seperate(str, "+")
     const intArr = strArr.map(str => splitByMinusAndCalculate(str))  
     const result = intArr.reduce((acc, no) => acc + no)
     return result
@@ -45,17 +45,41 @@ function splitByMinusAndCalculate(str) {
 }
 
 function splitByTimeAndCalculate(str) {
-    const strArr = str.split("*")
+    const strArr = seperate(str, "*")
     const intArr = strArr.map(str => splitByDivideAndCalculate(str))
     const result = intArr.reduce((acc, no) => acc * no)
     return result
 }
 
 function splitByDivideAndCalculate(str) {
-    const strArr = str.split("/")
+    const strArr = seperate(str, "/")
     const intArr = strArr.map(str => parseInt(str))
     const result = intArr.reduce((acc, no) => acc / no)
     return result
+}
+
+function seperate(str, operator) {
+    let res = []
+    let parantheses = 0
+    let el = ""
+
+    for (let i=0; i < str.length; i++) {
+        let currChar = str[i]
+        if (currChar === "(") parantheses++
+        if (currChar === ")") parantheses--
+        if (parantheses === 0 && operator === currChar) {
+            res.push(el)
+            el = ""
+        } else {
+            el += currChar
+        }
+    }
+
+    if (el !== "") {
+        res.push(el)
+    }
+
+    return res;
 }
 
 export default Calculate
