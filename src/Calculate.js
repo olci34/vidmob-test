@@ -1,12 +1,14 @@
 import { useState } from 'react'
+import ErrorsContainer from './ErrorsContainer'
 
 function Calculate() {
 
     const [input, setInput] = useState("")
-    const [result, setResult] = useState("")
+    const [result, setResult] = useState("0")
+    const [error, setError] = useState("")
     const handleChange = (e) => { setInput(e.target.value) }
     const handleCalculateButton = () => {
-        let result = calculate(input) 
+        let result = calculate(input, setError) 
         setResult(result)
     }
 
@@ -15,19 +17,22 @@ function Calculate() {
             <input id="input" type="text" value={input} onChange={handleChange}></input>
             <button id="calculate-button" onClick={handleCalculateButton}>Calculate</button>
             <h3 id="result"> Result: {result} </h3>
+            <ErrorsContainer errors={error} />
         </div>
     )
 }
 
-function calculate(str) {
+function calculate(str, setError) {
     // Get rid of spaces.
     str = str.replace(/\s/g, '')
+    setError("")
     // Check for validations
-    if (!inputValid(str)){
-        return alert('Invalid Input. Please only use digits and +-*/() characters without any space')
-    }
-    if (!syntaxValid(str)) {
-        return alert("Syntax Error.\nYou can't use more than 2 operators in series.\nThe second operator of a series can only be '-'.\nYou can't leave paranthesis open.\nYou can't start with operators expect it is a negative number.")
+    try {
+        inputValid(str)
+        syntaxValid(str)
+    } catch (error) {
+        setError(error.message)
+        return
     }
     return splitByPlusAndCalculate(str)
 }
@@ -108,21 +113,27 @@ function customSplit(str, operator) {
 
 // Validates operators and parantheses
 function syntaxValid(str) { 
+    const errorMessage = `Syntax Error.
+                            You can't use more than 2 operators in series.
+                            The second operator of a series can only be '-'.
+                            You can't leave paranthesis open.
+                            You can't start with operators expect it is a negative number.`
+    const error = new SyntaxError(errorMessage)
     /* 
     Validates for operators and parantheses of str.
     #syntaxValid() ignores inside of parantheses during validation.
     Because it is called in #calculate() and 
     #calculate() is called recursively to handle inside of parantheses.
     */
-    if ("+*/)".includes(str[0])) return false // str can't start with "+/*)"
-    if ("+-*/.".includes(str[str.length-1])) return false // str can't end with an operator
+    if ("+*/)".includes(str[0])) throw error // str can't start with "+/*)"
+    if ("+-*/.".includes(str[str.length-1])) throw error // str can't end with an operator
     let stack = []
     let operators = ["+","-","*","/"]
     let parantheses = 0
     for (let i=0; i < str.length; i++) {
         if (str[i] === "(") {
             parantheses++
-            if (stack.length === 2) return false
+            if (stack.length === 2) throw error
             stack = []
             continue
         }
@@ -132,16 +143,19 @@ function syntaxValid(str) {
         }
         if (parantheses === 0) {
             operators.includes(str[i]) ? stack.push(str[i]) : stack = []
-            if (stack[1] && stack[1] !== "-") return false
-            if (stack.length >= 3) return false
+            if (stack[1] && stack[1] !== "-") throw error
+            if (stack.length >= 3) throw error
         }
     }
-    return parantheses === 0
 }
 
 function inputValid(input) {
+    const error = new Error("Invalid Input. Please only use digits and +-*/() characters.")
     const inputArr = input.match(/[\d*/+-/().\s]/g)
-    return (inputArr && inputArr.length === input.length)
+    if (inputArr === null) throw error
+    if (inputArr && inputArr.length !== input.length) {
+        throw error
+    }
 }
 
 export default Calculate
