@@ -25,12 +25,8 @@ function splitByPlusAndCalculate(str) {
     const result = intArr.reduce((acc, no) => acc + no)
     return result
 }
-// 6-15--5*-4-35
-//   s  s    js
-// ij
-//33
-//ij
-function splitByMinusAndCalculate(str) { // -5--2
+
+function splitByMinusAndCalculate(str) {
     if (Number(str)) return parseInt(str)
     const strArr = []
     let s = 0
@@ -43,7 +39,7 @@ function splitByMinusAndCalculate(str) { // -5--2
             }
         }
     }
-    const intArr = strArr.map(str => parseInt(str))
+    const intArr = strArr.map(str => splitByTimeAndCalculate(str))
     const result = intArr.reduce((acc, no) => acc - no)
     return parseInt(result)
 }
