@@ -46,8 +46,15 @@ function splitByMinusAndCalculate(str) {
 
 function splitByTimeAndCalculate(str) {
     const strArr = str.split("*")
-    const intArr = strArr.map(str => parseInt(str))
+    const intArr = strArr.map(str => splitByDivideAndCalculate(str))
     const result = intArr.reduce((acc, no) => acc * no)
+    return result
+}
+
+function splitByDivideAndCalculate(str) {
+    const strArr = str.split("/")
+    const intArr = strArr.map(str => parseInt(str))
+    const result = intArr.reduce((acc, no) => acc / no)
     return result
 }
 
