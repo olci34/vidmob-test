@@ -20,7 +20,7 @@ function Calculate() {
 }
 
 function splitByPlusAndCalculate(str) {
-    const strArr = seperate(str, "+")
+    const strArr = customSplit(str, "+")
     const intArr = strArr.map(str => splitByMinusAndCalculate(str))  
     const result = intArr.reduce((acc, no) => acc + no)
     return result
@@ -30,10 +30,13 @@ function splitByMinusAndCalculate(str) {
     if (Number(str)) return parseInt(str)
     const strArr = []
     let s = 0
+    let parantheses = 0
     for (let j=0; j < str.length; j++) {
+        if (str[j] === "(") parantheses++
+        if (str[j] === ")") parantheses--
         if (j === str.length-1) strArr.push(str.substring(s,j+1))
-        if (str[j] === "-" && Number(str[j-1])) {
-            if (j > s) {
+        if (parantheses === 0) { 
+            if (str[j] === "-" && (Number(str[j-1]) || str[j-1] === "0")) { // Checks if "-" is used after an operator or paranthesis
                 strArr.push(str.substring(s,j))
                 s = j+1
             }
@@ -45,20 +48,27 @@ function splitByMinusAndCalculate(str) {
 }
 
 function splitByTimeAndCalculate(str) {
-    const strArr = seperate(str, "*")
+    const strArr = customSplit(str, "*")
     const intArr = strArr.map(str => splitByDivideAndCalculate(str))
     const result = intArr.reduce((acc, no) => acc * no)
     return result
 }
 
 function splitByDivideAndCalculate(str) {
-    const strArr = seperate(str, "/")
-    const intArr = strArr.map(str => parseInt(str))
+    const strArr = customSplit(str, "/")
+    const intArr = strArr.map(str => {
+        if (str[0] === "(") { 
+            // If we hit the paranthesis, we calculate it localy by using recursion.
+            return splitByPlusAndCalculate(str.substring(1, str.length-1))
+        } else {
+            return parseInt(str)
+        }
+    })
     const result = intArr.reduce((acc, no) => acc / no)
     return result
 }
 
-function seperate(str, operator) {
+function customSplit(str, operator) { // 
     let res = []
     let parantheses = 0
     let el = ""
@@ -75,7 +85,7 @@ function seperate(str, operator) {
         }
     }
 
-    if (el !== "") {
+    if (el !== "") { // If str doesn't include the operator
         res.push(el)
     }
 
