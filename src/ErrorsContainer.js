@@ -2,7 +2,7 @@ export default function ErrorsContainer(props) {
     const errors = props.errors
     return (
         <div id="errors">
-            <p>{errors}</p>
+            <p aria-label="current-errors">{errors}</p>
         </div>
     )
 }

@@ -22,9 +22,9 @@ function Calculate() {
 
     return (
         <div id='calculate-box'>
-            <input id="input" type="text" value={input} onChange={handleChange}></input>
+            <input id="input" aria-label="input" type="text" value={input} onChange={handleChange}></input>
             <button id="calculate-button" onClick={handleCalculateButton}>Calculate</button>
-            <h3 id="result"> Result: {result} </h3>
+            <h3 id="result"> Result: <label aria-label={"result"}>{result}</label> </h3>
             <ErrorsContainer errors={error} />
         </div>
     )
