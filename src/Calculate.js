@@ -8,8 +8,16 @@ function Calculate() {
     const [error, setError] = useState("")
     const handleChange = (e) => { setInput(e.target.value) }
     const handleCalculateButton = () => {
-        let result = calculate(input, setError) 
-        setResult(result)
+        // Get rid of spaces.
+         const str = input.replace(/\s/g, '')
+        try {
+            setError("")
+            const result = calculate(str)
+            setResult(result)
+        } catch (error) {
+            setResult(error.name)
+            setError(error.message)
+        }
     }
 
     return (
@@ -22,18 +30,13 @@ function Calculate() {
     )
 }
 
-function calculate(str, setError) {
-    // Get rid of spaces.
-    str = str.replace(/\s/g, '')
-    setError("")
-    // Check for validations
-    try {
-        inputValid(str)
-        syntaxValid(str)
-    } catch (error) {
-        setError(error.message)
-        return
-    }
+function calculate(str) {
+    // Check for validations.
+    if (!inputValid(str)) throw new Error('Please only use digits and +-*/() characters without any space.')
+    if (!syntaxValid(str)) throw new SyntaxError(`You can't use more than 2 operators in series.
+                                                    The second operator of a series can only be '-'.
+                                                    You can't leave paranthesis open.
+                                                    You can't start with operators unless it is a negative number.`)
     return splitByPlusAndCalculate(str)
 }
 
@@ -113,27 +116,22 @@ function customSplit(str, operator) {
 
 // Validates operators and parantheses
 function syntaxValid(str) { 
-    const errorMessage = `Syntax Error.
-                            You can't use more than 2 operators in series.
-                            The second operator of a series can only be '-'.
-                            You can't leave paranthesis open.
-                            You can't start with operators expect it is a negative number.`
-    const error = new SyntaxError(errorMessage)
     /* 
     Validates for operators and parantheses of str.
     #syntaxValid() ignores inside of parantheses during validation.
     Because it is called in #calculate() and 
     #calculate() is called recursively to handle inside of parantheses.
     */
-    if ("+*/)".includes(str[0])) throw error // str can't start with "+/*)"
-    if ("+-*/.".includes(str[str.length-1])) throw error // str can't end with an operator
+    if ("+*/)".includes(str[0]) || str.startsWith("--")) return false // str can't start with "+/*)" or "--"
+    if ("+-*/.".includes(str[str.length-1])) return false // str can't end with an operator
+    if (str.match(/([.])+[+-/*(]/)) return false // validates usage of "."
     let stack = []
     let operators = ["+","-","*","/"]
     let parantheses = 0
     for (let i=0; i < str.length; i++) {
         if (str[i] === "(") {
             parantheses++
-            if (stack.length === 2) throw error
+            if (stack.length === 2) return false
             stack = []
             continue
         }
@@ -143,19 +141,16 @@ function syntaxValid(str) {
         }
         if (parantheses === 0) {
             operators.includes(str[i]) ? stack.push(str[i]) : stack = []
-            if (stack[1] && stack[1] !== "-") throw error
-            if (stack.length >= 3) throw error
+            if (stack[1] && stack[1] !== "-") return false // Second operator in a series can only be "-"
+            if (stack.length > 2) return false // Operator series can't be longer than 2
         }
     }
+    return parantheses === 0
 }
 
 function inputValid(input) {
-    const error = new Error("Invalid Input. Please only use digits and +-*/() characters.")
-    const inputArr = input.match(/[\d*/+-/().\s]/g)
-    if (inputArr === null) throw error
-    if (inputArr && inputArr.length !== input.length) {
-        throw error
-    }
+    const inputArr = input.match(/[\d*/+-/().]/g)
+    return (inputArr && inputArr.length === input.length)
 }
 
 export default Calculate

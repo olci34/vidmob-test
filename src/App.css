@@ -21,6 +21,7 @@ body {
   position: relative;
   width: 80%;
   font-size: inherit;
+  text-align: center;
 }
 
 #calculate-button {
