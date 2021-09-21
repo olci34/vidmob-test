@@ -31,7 +31,7 @@ function Calculate() {
 }
 
 function calculate(str) {
-    // Check for validations.
+    // Checks for validations first.
     if (!inputValid(str)) throw new Error('Please only use digits and +-*/() characters without any space.')
     if (!syntaxValid(str)) throw new SyntaxError(`You can't use more than 2 operators in series.
                                                     The second operator of a series can only be '-'.
@@ -48,7 +48,7 @@ function splitByPlusAndCalculate(str) {
 }
 
 function splitByMinusAndCalculate(str) {
-    if (Number(str)) return Number(Number(str).toFixed(2))
+    if (Number(str)) return toDecimal(str)
     const strArr = []
     let s = 0
     let parantheses = 0
@@ -66,7 +66,7 @@ function splitByMinusAndCalculate(str) {
     }
     const intArr = strArr.map(str => splitByTimeAndCalculate(str))
     const result = intArr.reduce((acc, no) => acc - no)
-    return Number(Number(result).toFixed(2))
+    return toDecimal(result)
 }
 
 function splitByTimeAndCalculate(str) {
@@ -83,7 +83,7 @@ function splitByDivideAndCalculate(str) {
             // If we hit the paranthesis, we calculate it localy by using recursion.
             return calculate(str.substring(1, str.length-1))
         } else {
-            return Number(Number(str).toFixed(2))
+            return toDecimal(str)
         }
     })
     const result = intArr.reduce((acc, no) => acc / no)
@@ -151,6 +151,11 @@ function syntaxValid(str) {
 function inputValid(input) {
     const inputArr = input.match(/[\d*/+-/().]/g)
     return (inputArr && inputArr.length === input.length)
+}
+
+function toDecimal(str) {
+    // converts String to decimal Numbers
+    return Number(Number(str).toFixed(2))
 }
 
 export default Calculate
