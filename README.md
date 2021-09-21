@@ -9,7 +9,7 @@ It also supports decimal numbers and parantheses, even if they are nested.
         In order to run this file, Node.js should be installed in your computer.
         
 Download this repo. In your command line, change the current directory to downloaded file.
-Run ```npm start```
+Run first ```npm install``` and then ```npm start```
 
 
 ## Rules
