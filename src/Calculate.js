@@ -11,7 +11,7 @@ function Calculate() {
         // Get rid of spaces.
          const str = input.replace(/\s/g, '')
         try {
-            setError("")
+            setError("") // Clean previous operation error
             const result = calculate(str)
             setResult(result)
         } catch (error) {
@@ -47,6 +47,16 @@ function splitByPlusAndCalculate(str) {
     return result
 }
 
+/*
+    In order to sustain the order of operations logic,
+    we make benefit of execution context and call stack.
+    Calling the operation functions in each other in the order of
+    addition, subtraction, multiplication, division sets the call stack in reverse order which
+    makes our code adhere to order of operations principle.
+
+    When splitting, every parantheses is ignored and passed to next function.
+    Then gets calculated with recursion. Please check #splitByDivideAndCalculate method below.
+*/
 function splitByMinusAndCalculate(str) {
     if (Number(str)) return toDecimal(str)
     const strArr = []
@@ -79,8 +89,12 @@ function splitByTimeAndCalculate(str) {
 function splitByDivideAndCalculate(str) {
     const strArr = customSplit(str, "/")
     const intArr = strArr.map(str => {
+    /* 
+        If a parantheses is passed as an argument, get rid of the outer parantheses and
+        calculate inside with #calculate method. This will cause recursion and
+        inner parantheses will be calculated as well. This way we handle nested parantheses. 
+    */
         if (str[0] === "(") {
-            // If we hit the paranthesis, we calculate it localy by using recursion.
             return calculate(str.substring(1, str.length-1))
         } else {
             return toDecimal(str)
@@ -99,6 +113,7 @@ function customSplit(str, operator) {
         let currChar = str[i]
         if (currChar === "(") parantheses++
         if (currChar === ")") parantheses--
+        //
         if (parantheses === 0 && operator === currChar) {
             res.push(el)
             el = ""
@@ -114,7 +129,6 @@ function customSplit(str, operator) {
     return res;
 }
 
-// Validates operators and parantheses
 function syntaxValid(str) { 
     /* 
     Validates for operators and parantheses of str.
@@ -153,8 +167,7 @@ function inputValid(input) {
     return (inputArr && inputArr.length === input.length)
 }
 
-function toDecimal(str) {
-    // converts String to decimal Numbers
+function toDecimal(str) { // converts String to decimal Numbers
     return Number(Number(str).toFixed(2))
 }
 
